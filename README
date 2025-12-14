@@ -1,4 +1,15 @@
+I understand\! While the content of your README is excellent and comprehensive, the formatting is a bit messy in places, making it hard to read and unprofessional.
+
+I've taken your existing content and cleaned up the formatting, fixed the code block issues, ensured proper markdown for headings and lists, and organized the sections logically.
+
+Here is the significantly improved and corrected version of your `README.md`:
+
+-----
+
+````markdown
 # 🇪🇺 European Option Pricing Dashboard
+
+## Comparative Pricing Tool for European Options
 
 A full-stack web application designed for pricing **European call and put options** using three distinct, comparative methodologies:
 
@@ -6,13 +17,13 @@ A full-stack web application designed for pricing **European call and put option
 2.  **Analytical (Black-Scholes)**: The industry standard, closed-form Black-Scholes formula.
 3.  **Simulation (Monte Carlo)**: A computationally intensive reference pricing method.
 
-This application provides interactive visualizations and real-time comparisons of these pricing methods, serving as an excellent tool for traders, students, and researchers exploring quantitative finance.
+This application provides **interactive visualizations** and **real-time comparisons** of these pricing methods, serving as an excellent tool for traders, students, and researchers exploring quantitative finance.
 
 
 
 ---
 
-## 🌟 Features
+## ✨ Features
 
 * **Interactive Mode**: Real-time option price calculation as you adjust parameters.
 * **Input Sliders & Fields** for all standard option pricing parameters:
@@ -63,12 +74,54 @@ cd backend
 pip install -r requirements.txt
 # To run the server
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-The backend server will typically run at http://localhost:8000.2. Frontend SetupThe frontend hosts the interactive dashboard and visualizations.Bashcd frontend
+````
+
+The backend server will typically run at `http://localhost:8000`.
+
+### 2\. Frontend Setup
+
+The frontend hosts the interactive dashboard and visualizations.
+
+```bash
+cd frontend
 npm install
 npm run dev
-The frontend application will typically run at http://localhost:3000.
-📊 Dataset & Model1. Dataset GenerationThe dataset is generated using the Black-Scholes formula to simulate realistic European option prices for various parameters ($S, K, T, \sigma, r$).
-Model Training (GBDT)A XGBoost regressor is trained using modeling_gbdt.py on the synthetic dataset to predict the simulated Monte Carlo option price. This allows the API to serve a highly accurate, near-instantaneous ML-based price, circumventing the slow computational overhead of real-time Monte Carlo simulations. The trained model is saved as backend/models/gbdt_model_large.json.⚙️ API DocumentationHealth CheckGET /Response: {"status": "API is running"}Predict Option PricePOST /predictRequest Body (JSON):JSON{
+```
+
+The frontend application will typically run at `http://localhost:3000`.
+
+-----
+
+## 📊 Dataset & Model
+
+### Dataset Generation
+
+The dataset is generated using the Black-Scholes formula to simulate realistic European option prices for various parameters ($S, K, T, \sigma, r$). A small amount of noise is added to the Black-Scholes price to simulate the Monte Carlo reference, which is the target variable ($\mathbf{y}$) for the GBDT model. The relevant files are **`monte_carlo_dataset.py`** and **`data_preparation.py`**.
+
+### Model Training (GBDT)
+
+A **XGBoost** regressor is trained using **`modeling_gbdt.py`** on the synthetic dataset to predict the simulated Monte Carlo option price. This allows the API to serve a highly accurate, near-instantaneous ML-based price, circumventing the slow computational overhead of real-time Monte Carlo simulations. The trained model is saved as `backend/models/gbdt_model_large.json`.
+
+-----
+
+## ⚙️ API Documentation
+
+### Health Check
+
+  * **GET** `/`
+  * **Response**:
+    ```json
+    {"status": "API is running"}
+    ```
+
+### Predict Option Price
+
+  * **POST** `/predict`
+
+**Request Body (JSON):**
+
+```json
+{
   "S": 100,
   "K": 100,
   "T": 1.0,
@@ -76,13 +129,25 @@ Model Training (GBDT)A XGBoost regressor is trained using modeling_gbdt.py on th
   "r": 0.05,
   "type": 1  // 1 for Call, 0 for Put
 }
-Response Body (JSON):JSON{
+```
+
+**Response Body (JSON):**
+
+```json
+{
   "option_type": "Call",
   "gbdt_price": 9.8359,
   "bs_price": 10.4506,
   "mc_price": 10.513
 }
-📄 Project Structure (Matching Your Files)PostgreSQL & PL/pgSQLproject-root/
+```
+
+-----
+
+## 📁 Project Structure
+
+```pgsql
+project-root/
 ├─ backend/
 │  ├─ __pycache__
 │  ├─ models/
@@ -109,3 +174,4 @@ Response Body (JSON):JSON{
 │  └─ tsconfig.json
 ├─ .gitignore
 └─ makefile
+```
