@@ -1,0 +1,111 @@
+# 🇪🇺 European Option Pricing Dashboard
+
+A full-stack web application designed for pricing **European call and put options** using three distinct, comparative methodologies:
+
+1.  **Machine Learning (GBDT)**: A Gradient Boosted Decision Tree model trained on Monte Carlo simulated data.
+2.  **Analytical (Black-Scholes)**: The industry standard, closed-form Black-Scholes formula.
+3.  **Simulation (Monte Carlo)**: A computationally intensive reference pricing method.
+
+This application provides interactive visualizations and real-time comparisons of these pricing methods, serving as an excellent tool for traders, students, and researchers exploring quantitative finance.
+
+
+
+---
+
+## 🌟 Features
+
+* **Interactive Mode**: Real-time option price calculation as you adjust parameters.
+* **Input Sliders & Fields** for all standard option pricing parameters:
+    * **Spot price** ($S$)
+    * **Strike price** ($K$)
+    * **Time to maturity** ($T$)
+    * **Volatility** ($\sigma$)
+    * **Risk-free rate** ($r$)
+    * **Option type** (Call / Put)
+* **Comparative Pricing Display** of:
+    * Predicted **GBDT Price** (Machine Learning)
+    * **Black-Scholes** Analytical Price
+    * **Monte Carlo** Simulated Price
+* **Value Decomposition**: Display of **Intrinsic Value** and **Time Value**.
+* **Visualization**: Interactive charts for price comparison and sensitivity analysis.
+* **Presets**: Quick preset options for testing common scenarios (ATM, OTM, ITM).
+
+---
+
+## 💻 Tech Stack
+
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Backend** | Python, FastAPI | High-performance API framework for ML model serving. |
+| **Machine Learning** | XGBoost, NumPy, pandas | Used for the GBDT model and data handling. |
+| **Frontend** | React / Next.js, TypeScript | Modern, scalable, and type-safe user interface. |
+| **Styling** | Tailwind CSS | Utility-first CSS framework for rapid UI development. |
+| **Communication** | REST API (CORS enabled) | Standard communication protocol between frontend and backend. |
+| **Deployment** | Docker | Containerization for consistent and isolated environments. |
+| **Visualization** | Custom React Components | Interactive and responsive charts. |
+
+---
+
+## 🛠️ Installation
+
+### Requirements
+
+* **Python** (>= 3.11)
+* **Node.js** (>= 18)
+* `npm` or `yarn`
+
+### 1. Backend Setup
+
+The backend handles the pricing logic (Black-Scholes, Monte Carlo, GBDT Model).
+
+```bash
+cd backend
+pip install -r requirements.txt
+# To run the server
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+The backend server will typically run at http://localhost:8000.2. Frontend SetupThe frontend hosts the interactive dashboard and visualizations.Bashcd frontend
+npm install
+npm run dev
+The frontend application will typically run at http://localhost:3000.📊 Dataset & Model1. Dataset GenerationThe dataset is generated using the Black-Scholes formula to simulate realistic European option prices for various parameters ($S, K, T, \sigma, r$). A small amount of noise is added to the Black-Scholes price to simulate the Monte Carlo reference, which is the target variable ($\mathbf{y}$) for the GBDT model. The relevant files are monte_carlo_dataset.py and data_preparation.py.The core Black-Scholes function used for data generation:$$\text{Call} = S N(d_1) - K e^{-rT} N(d_2) \\
+\text{Put} = K e^{-rT} N(-d_2) - S N(-d_1)$$where$$d_1 = \frac{\ln(S/K) + (r + \frac{1}{2}\sigma^2)T}{\sigma\sqrt{T}} \\
+d_2 = d_1 - \sigma\sqrt{T}$$2. Feature EngineeringTo aid the GBDT model, the following features are engineered from the raw inputs (done in data_preparation.py):Moneyness: $\text{moneyness} = S / K$Volatility-Time Factor: $\text{vol\_sqrtT} = \sigma \times \sqrt{T}$Log Moneyness: $\text{log\_moneyness} = \ln(\text{moneyness})$3. Model Training (GBDT)A XGBoost regressor is trained using modeling_gbdt.py on the synthetic dataset to predict the simulated Monte Carlo option price. This allows the API to serve a highly accurate, near-instantaneous ML-based price, circumventing the slow computational overhead of real-time Monte Carlo simulations. The trained model is saved as backend/models/gbdt_model_large.json.⚙️ API DocumentationHealth CheckGET /Response: {"status": "API is running"}Predict Option PricePOST /predictRequest Body (JSON):JSON{
+  "S": 100,
+  "K": 100,
+  "T": 1.0,
+  "sigma": 0.2,
+  "r": 0.05,
+  "type": 1  // 1 for Call, 0 for Put
+}
+Response Body (JSON):JSON{
+  "option_type": "Call",
+  "gbdt_price": 9.8359,
+  "bs_price": 10.4506,
+  "mc_price": 10.513
+}
+📄 Project Structure (Matching Your Files)PostgreSQL & PL/pgSQLproject-root/
+├─ backend/
+│  ├─ __pycache__
+│  ├─ models/
+│  ├─ data_preparation.py      # Feature engineering script
+│  ├─ main.py                  # FastAPI application entry point
+│  ├─ modeling_gbdt.py         # GBDT training script
+│  ├─ monte_carlo_dataset.py   # Monte Carlo simulation script
+│  └─ requirements.txt
+├─ frontend/
+│  ├─ .next/
+│  ├─ app/                     # Next.js App Router pages
+│  ├─ components/              # UI components (e.g., dashboard, charts)
+│  ├─ hooks/                   # Custom React hooks
+│  ├─ lib/                     # Utility functions (e.g., API services)
+│  ├─ node_modules/
+│  ├─ public/                  # Static assets
+│  ├─ styles/                  # Custom styles
+│  ├─ components.json
+│  ├─ next-env.d.ts
+│  ├─ next.config.js
+│  ├─ package-lock.json
+│  ├─ package.json
+│  ├─ postcss.config.mjs
+│  └─ tsconfig.json
+├─ .gitignore
+└─ makefile

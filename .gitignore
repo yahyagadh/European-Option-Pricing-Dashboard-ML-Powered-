@@ -1,0 +1,37 @@
+
+---
+
+### **.gitignore**
+```gitignore
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+*.env
+
+# FastAPI / general
+*.db
+*.sqlite3
+models/*.json
+
+# Node / React
+node_modules/
+.next/
+out/
+dist/
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# FILES
+*.csv
